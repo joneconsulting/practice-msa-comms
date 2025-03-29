@@ -1,0 +1,43 @@
+### Add user
+POST {{base-url}}:8081/users
+Content-Type: application/json
+
+{
+  "name": "Dowon Lee",
+  "email": "edowon0623@gmail.com",
+  "pwd": "12345678"
+}
+
+### Login user
+POST {{base-url}}:8081/login
+Content-Type: application/json
+
+{
+  "email": "edowon0623@gmail.com",
+  "password": "12345678"
+}
+> {%
+    client.global.set("auth_token", response.headers.valueOf("token"));
+    client.log(client.global.get("auth_token"));
+%}
+
+### Retrieve all users
+GET {{base-url}}:8081/users
+Authorization: Bearer {{auth_token}}
+
+### Retrieve one user detail
+GET {{base-url}}:8081/users/{{user-id}}
+Authorization: Bearer {{auth_token}}
+
+### Add iteam
+POST {{base-url}}:8082/{{user-id}}/orders
+Content-Type: application/json
+
+{
+  "productId": "CATALOG-001",
+  "qty": 70,
+  "unitPrice": 1200
+}
+
+### Retrieve order items
+GET {{base-url}}:8082/{{user-id}}/orders
