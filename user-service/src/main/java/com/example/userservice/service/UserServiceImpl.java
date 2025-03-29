@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = mapper.map(userEntity.get(), UserDto.class);
         userDto.setOrders(ordersList);
 
-        log.info("After called orders microservice");
+        log.info("After called orders microservice using grpc api");
 
         return userDto;
     }
