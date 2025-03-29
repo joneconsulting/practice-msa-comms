@@ -3,6 +3,7 @@ package com.example.userservice.service;
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.jpa.UserRepository;
+import com.example.userservice.vo.OrderDto;
 import com.example.userservice.vo.ResponseOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,10 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -85,20 +83,63 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("User not found");
 
         log.info("Before call orders microservice");
-        List<ResponseOrder> ordersList = new ArrayList<>();
-        String orderUrl = String.format("http://127.0.0.1:8082/%s/orders", userId);
-        ResponseEntity<List<ResponseOrder>> orderListResponse =
-                restTemplate.exchange(orderUrl, HttpMethod.GET, null,
-                                            new ParameterizedTypeReference<List<ResponseOrder>>() {
-                });
-        ordersList = orderListResponse.getBody();
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(userEntity.get(), UserDto.class);
-        userDto.setOrders(ordersList);
 
-        log.info("After called orders microservice using restful api");
+//        String orderUrl = String.format("http://127.0.0.1:8082/%s/orders", userId);
+//        ResponseEntity<List<ResponseOrder>> orderListResponse =
+//                restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+//                                            new ParameterizedTypeReference<List<ResponseOrder>>() {
+//                });
+//        ordersList = orderListResponse.getBody();
+        // GraphQL query to fetch orders for the user, requesting specific fields
+
+        String orderServiceGraphQLEndpoint = "http://localhost:8082/graphql";
+        String graphQLQuery = """
+            query($uid: ID!) {
+              ordersByUser(userId: $uid) {
+                orderId
+                productId
+                qty
+                unitPrice
+                totalPrice
+              }
+            }
+            """;
+        // Build the request payload
+        Map<String, Object> jsonRequest = new HashMap<>();
+        jsonRequest.put("query", graphQLQuery);
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("uid", userId);
+        jsonRequest.put("variables", vars);
+
+        // Send POST request to Order Service GraphQL endpoint
+        ResponseEntity<Map> response = restTemplate.postForEntity(orderServiceGraphQLEndpoint, jsonRequest, Map.class);
+        // The response body will contain data under the "data" key
+        Map<String, Object> responseBody = response.getBody();
+        if (responseBody == null || !responseBody.containsKey("data")) {
+            return userDto;
+        }
+
+        // Extract the orders list from the response
+        Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+        List<Map<String, Object>> ordersData = (List<Map<String, Object>>) data.get("ordersByUser");
+        // Convert to OrderDTO list
+        List<OrderDto> ordersList = new ArrayList<>();
+        for (Map<String, Object> orderMap : ordersData) {
+            OrderDto dto = new OrderDto(
+                    (String)orderMap.get("orderId"),
+                    (String)orderMap.get("productId"),
+                    (Integer) orderMap.get("qty"),
+                    (Integer) orderMap.get("unitPrice"),
+                    (Integer) orderMap.get("totalPrice"));
+            ordersList.add(dto);
+        }
+
+        userDto.setOrders(ordersList);
+        log.info("After called orders microservice using graphql api");
 
         return userDto;
     }

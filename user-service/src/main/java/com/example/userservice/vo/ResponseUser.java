@@ -21,5 +21,5 @@ public class ResponseUser {
     private String userId;
 
     @Schema(title = "주문 상품 목록", description = "사용자가 주문한 주문 내역")
-    private List<ResponseOrder> orders;
+    private List<OrderDto> orders;
 }
