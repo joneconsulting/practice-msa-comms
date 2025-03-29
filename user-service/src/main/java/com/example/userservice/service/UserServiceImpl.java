@@ -1,14 +1,10 @@
 package com.example.userservice.service;
 
-import com.example.orderservice.grpc.OrderRequest;
-import com.example.orderservice.grpc.OrderResponse;
-import com.example.orderservice.grpc.OrderServiceGrpc;
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.jpa.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,9 +33,6 @@ public class UserServiceImpl implements UserService {
 
     Environment env;
     RestTemplate restTemplate;
-
-    @GrpcClient("order-service")
-    private OrderServiceGrpc.OrderServiceBlockingStub orderStub;
 
     CircuitBreakerFactory circuitBreakerFactory;
 
@@ -93,23 +85,20 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("User not found");
 
         log.info("Before call orders microservice");
-        OrderRequest request = OrderRequest.newBuilder()
-                .setUserId(userId)
-                .build();
-
-        OrderResponse response = orderStub.getOrders(request);
-        List<ResponseOrder> ordersList = response.getOrdersList().stream()
-                .map(order -> new ResponseOrder(order.getOrderId(),
-                        order.getProductId(), order.getQty(), order.getUnitPrice(),
-                        order.getTotalPrice(), order.getCreatedAt()))
-                .toList();
+        List<ResponseOrder> ordersList = new ArrayList<>();
+        String orderUrl = String.format("http://127.0.0.1:8082/%s/orders", userId);
+        ResponseEntity<List<ResponseOrder>> orderListResponse =
+                restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+                                            new ParameterizedTypeReference<List<ResponseOrder>>() {
+                });
+        ordersList = orderListResponse.getBody();
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(userEntity.get(), UserDto.class);
         userDto.setOrders(ordersList);
 
-        log.info("After called orders microservice");
+        log.info("After called orders microservice using restful api");
 
         return userDto;
     }
