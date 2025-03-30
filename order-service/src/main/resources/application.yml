@@ -23,7 +23,6 @@ grpc:
   server:
     port: 9099
 
-
 logging:
   level:
     com.example.orderservice: DEBUG
