@@ -92,6 +92,24 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
+
+        <!-- Apple Silicon (arm64, M1/M2) -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <classifier>osx-aarch_64</classifier>
+            <version>4.1.109.Final</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Intel CPU (x86_64) -->
+<!--        <dependency>-->
+<!--            <groupId>io.netty</groupId>-->
+<!--            <artifactId>netty-resolver-dns-native-macos</artifactId>-->
+<!--            <classifier>osx-x86_64</classifier>-->
+<!--            <version>4.1.109.Final</version>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
     </dependencies>
     <dependencyManagement>
         <dependencies>

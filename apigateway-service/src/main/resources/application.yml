@@ -1,5 +1,6 @@
 server:
   port: 8000
+  forward-headers-strategy: NATIVE
 
 eureka:
   client:
@@ -23,11 +24,18 @@ spring:
         - id: user-service-route
           uri: lb://USER-SERVICE
           predicates:
-            - Path=/api/users/**
+            - Path=/user-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
         - id: order-service-route
           uri: lb://ORDER-SERVICE
           predicates:
-            - Path=/api/orders/**
+            - Path=/order-service/**
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/order-service/(?<segment>.*), /$\{segment}
+
 
 #token:
 #  secret: user_token
