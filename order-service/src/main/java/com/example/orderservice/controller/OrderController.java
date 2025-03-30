@@ -69,7 +69,7 @@ public class OrderController {
             result.add(new ModelMapper().map(v, ResponseOrder.class));
         });
 
-        log.info("Add retrieved orders data");
+        log.info("After retrieved orders data");
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
