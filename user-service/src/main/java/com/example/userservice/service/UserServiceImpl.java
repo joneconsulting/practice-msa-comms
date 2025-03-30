@@ -88,14 +88,7 @@ public class UserServiceImpl implements UserService {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         UserDto userDto = mapper.map(userEntity.get(), UserDto.class);
 
-//        String orderUrl = String.format("http://127.0.0.1:8082/%s/orders", userId);
-//        ResponseEntity<List<ResponseOrder>> orderListResponse =
-//                restTemplate.exchange(orderUrl, HttpMethod.GET, null,
-//                                            new ParameterizedTypeReference<List<ResponseOrder>>() {
-//                });
-//        ordersList = orderListResponse.getBody();
         // GraphQL query to fetch orders for the user, requesting specific fields
-
         String orderServiceGraphQLEndpoint = "http://localhost:8082/graphql";
         String graphQLQuery = """
             query($uid: ID!) {

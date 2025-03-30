@@ -1,0 +1,12 @@
+type Order {
+    orderId: ID
+    userId: ID
+    productId: String
+    qty: Int
+    unitPrice: Int
+    totalPrice: Int
+    createdAt: String
+}
+type Query {
+    ordersByUser(userId: ID!): [Order]
+}
