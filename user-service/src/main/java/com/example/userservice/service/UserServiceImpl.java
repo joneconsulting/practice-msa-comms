@@ -3,6 +3,8 @@ package com.example.userservice.service;
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.jpa.UserRepository;
+import com.example.userservice.config.RoutingDataSource;
+import com.example.userservice.utils.ShardingKeyUtil;
 import com.example.userservice.vo.ResponseOrder;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -70,6 +72,8 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = mapper.map(userDto, UserEntity.class);
         userEntity.setEncryptedPwd(passwordEncoder.encode(userDto.getPwd()));
 
+        setShardKeyByUserId(userDto.getUserId());
+
         userRepository.save(userEntity);
 
         UserDto returnUserDto = mapper.map(userEntity, UserDto.class);
@@ -79,7 +83,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserByUserId(String userId) {
-        Optional<UserEntity> userEntity = userRepository.findByUserId(userId);
+        UserEntity userEntity;
+        try {
+            setShardKeyByUserId(userId);
+            userEntity = userRepository.findByUserId(userId).orElse(null);
+        } finally {
+            RoutingDataSource.clear(); // context cleanup
+        }
 
         if (userEntity == null)
             throw new UsernameNotFoundException("User not found");
@@ -95,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        UserDto userDto = mapper.map(userEntity.get(), UserDto.class);
+        UserDto userDto = mapper.map(userEntity, UserDto.class);
         userDto.setOrders(ordersList);
 
         log.info("After called orders microservice using restful api");
@@ -119,5 +129,10 @@ public class UserServiceImpl implements UserService {
 
         UserDto userDto = mapper.map(optionalUserEntity.get(), UserDto.class);
         return userDto;
+    }
+
+    private void setShardKeyByUserId(String userId) {
+        int shardKey = ShardingKeyUtil.uuidToShardKey(userId, 2);
+        RoutingDataSource.setShardKey(shardKey);
     }
 }
