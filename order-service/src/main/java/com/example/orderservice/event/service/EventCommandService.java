@@ -6,11 +6,13 @@ import com.example.orderservice.event.entity.OrderEvent;
 import com.example.orderservice.event.entity.EventType;
 import com.example.orderservice.event.repository.OrderEventRepository;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 public class EventCommandService {
     private final OrderEventRepository orderEventRepository;
@@ -37,6 +39,8 @@ public class EventCommandService {
         event.setTimestamp(LocalDateTime.now());
 
         orderEventRepository.save(event);
+
+        log.info("이벤트 발행 {}", event.getUserId());
         publisher.publishEvent(event);
     }
 
