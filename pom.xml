@@ -15,8 +15,6 @@
     <modules>
         <module>order-service</module>
         <module>user-service</module>
-        <module>apigateway-service</module>
-        <module>service-discovery</module>
     </modules>
     <name>msa-spring-cloud</name>
     <description>Demo project for Spring Boot</description>

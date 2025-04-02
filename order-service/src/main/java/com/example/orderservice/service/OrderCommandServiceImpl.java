@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class OrderCommandServiceImpl implements OrderService {
     OrderRepository orderRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    public OrderCommandServiceImpl(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
     }
 
@@ -37,14 +37,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDto getOrderByOrderId(String orderId) {
-        OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
-        OrderDto orderDto = new ModelMapper().map(orderEntity, OrderDto.class);
-
-        return orderDto;
+        return null;
     }
 
     @Override
     public Iterable<OrderEntity> getOrdersByUserId(String userId) {
-        return orderRepository.findByUserId(userId);
+        return null;
     }
 }
