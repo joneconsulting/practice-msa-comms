@@ -5,6 +5,7 @@ import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.service.OrderService;
 import com.example.orderservice.vo.RequestOrder;
 import com.example.orderservice.vo.ResponseOrder;
+import com.example.saga.OrderCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -52,7 +53,7 @@ public class OrderController {
         orderDto.setTotalPrice(orderDetails.getQty() * orderDetails.getUnitPrice());
 
         /* jpa */
-        OrderDto createdOrder = orderService.createOrder(orderDto);
+        OrderCreatedEvent createdOrder = orderService.createOrder(orderDto);
         ResponseOrder responseOrder = mapper.map(createdOrder, ResponseOrder.class);
 
         log.info("After added orders data");

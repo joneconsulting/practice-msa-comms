@@ -1,5 +1,6 @@
 package com.example.orderservice.jpa;
 
+import com.example.orderservice.config.OrderStatus;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -33,4 +34,8 @@ public class OrderEntity implements Serializable {
     @Column(nullable = false, updatable = false, insertable = false)
     @ColumnDefault(value = "CURRENT_TIMESTAMP")
     private Date createdAt;
+
+    private boolean simulateCancel;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 }

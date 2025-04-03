@@ -1,14 +1,18 @@
 package com.example.orderservice.service;
 
+import com.example.orderservice.config.OrderStatus;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.jpa.OrderRepository;
+import com.example.saga.OrderCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -25,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto createOrder(OrderDto orderDto) {
+    public OrderCreatedEvent createOrder(OrderDto orderDto) {
         log.info("Requested an order from {}", orderDto.getUserId());
         orderDto.setOrderId(UUID.randomUUID().toString());
         orderDto.setTotalPrice(orderDto.getQty() * orderDto.getUnitPrice());
@@ -33,21 +37,26 @@ public class OrderServiceImpl implements OrderService {
         ModelMapper mapper = new ModelMapper();
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         OrderEntity orderEntity = mapper.map(orderDto, OrderEntity.class);
-
+        orderEntity.setStatus(OrderStatus.PENDING);
         orderRepository.save(orderEntity);
 
-        OrderDto returnValue = mapper.map(orderEntity, OrderDto.class);
+//        OrderDto returnValue = mapper.map(orderEntity, OrderDto.class);
+        // Publish an OrderCreatedEvent to notify other services
+        OrderCreatedEvent event = new OrderCreatedEvent(
+                orderEntity.getOrderId(), orderEntity.getProductId(),
+                orderEntity.getQty(), orderEntity.getTotalPrice(),
+                orderEntity.isSimulateCancel());
 
-        orderProducer.publishOrder(returnValue);
-        log.info("Sent a message with ordered item({}) to Kafka broker", returnValue.getOrderId());
+        orderProducer.publishOrder(event);
+        log.info("Order Created Successfully. Order ID: {}", orderEntity.getOrderId());
 
-        return returnValue;
+        return event;
     }
 
     @Override
     public OrderDto getOrderByOrderId(String orderId) {
-        OrderEntity orderEntity = orderRepository.findByOrderId(orderId);
-        OrderDto orderDto = new ModelMapper().map(orderEntity, OrderDto.class);
+        Optional<OrderEntity> orderEntity = orderRepository.findByOrderId(orderId);
+        OrderDto orderDto = new ModelMapper().map(orderEntity.get(), OrderDto.class);
 
         return orderDto;
     }

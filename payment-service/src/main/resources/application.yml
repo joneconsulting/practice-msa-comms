@@ -1,21 +1,29 @@
 server:
-  port: 8082
+  port: 8084
 
 spring:
   application:
-    name: order-service
+    name: payment-service
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+    show-sql: true
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb
     username: sa
     password:
+
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: order-service-group
+      group-id: payment-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -38,10 +46,6 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-#grpc:
-#  server:
-#    port: 9099
-
 logging:
   level:
     com.example.orderservice: DEBUG
@@ -53,4 +57,3 @@ management:
     web:
       exposure:
         include: health, httptrace, info, metrics, prometheus
-
