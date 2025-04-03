@@ -1,10 +1,12 @@
 package com.example.orderservice.service;
 
 import com.example.orderservice.config.OrderStatus;
+import com.example.orderservice.config.Schemas;
 import com.example.orderservice.dto.OrderDto;
 import com.example.orderservice.jpa.OrderEntity;
 import com.example.orderservice.jpa.OrderRepository;
 import com.example.saga.OrderCreatedEvent;
+import com.example.saga.OrderCreatedV1Event;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -29,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderCreatedEvent createOrder(OrderDto orderDto) {
+    public OrderCreatedV1Event createOrder(OrderDto orderDto) {
         log.info("Requested an order from {}", orderDto.getUserId());
         orderDto.setOrderId(UUID.randomUUID().toString());
         orderDto.setTotalPrice(orderDto.getQty() * orderDto.getUnitPrice());
@@ -42,7 +44,8 @@ public class OrderServiceImpl implements OrderService {
 
 //        OrderDto returnValue = mapper.map(orderEntity, OrderDto.class);
         // Publish an OrderCreatedEvent to notify other services
-        OrderCreatedEvent event = new OrderCreatedEvent(
+        OrderCreatedV1Event event = new OrderCreatedV1Event(
+                Schemas.V1,
                 orderEntity.getOrderId(), orderEntity.getProductId(),
                 orderEntity.getQty(), orderEntity.getTotalPrice(),
                 orderEntity.isSimulateCancel());

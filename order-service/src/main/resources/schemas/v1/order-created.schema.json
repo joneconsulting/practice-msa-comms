@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrderCreatedEvent",
+  "type": "object",
+  "required": ["version", "orderId", "productName", "quantity", "price", "simulateCancel"],
+  "properties": {
+    "version": { "type": "string" },
+    "orderId": { "type": "integer" },
+    "productName": { "type": "string" },
+    "quantity": { "type": "integer" },
+    "price": { "type": "number" },
+    "simulateCancel": { "type": "boolean" }
+  }
+}
