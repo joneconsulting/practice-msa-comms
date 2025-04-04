@@ -39,4 +39,4 @@
 > * branch 명: eda
 * JSON Schema 검증 방식을 이용하여 Kafka에 전송되는 메시지에 대해 버전 관리 및 검증 처리
 * 기존 KafkaTemplate<String, Object>를 KafkaTemplate<String, String>로 변경
-* Kafka에 메시지를 발송/수신할 떄 검증 처리
+* Kafka에 메시지를 발송/수신할 떄 검증 처리 - order-created.schema.json

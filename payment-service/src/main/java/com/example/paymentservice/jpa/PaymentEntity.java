@@ -9,6 +9,7 @@ import java.util.Date;
 
 @Data
 @Entity
+@Table(name="payments")
 public class PaymentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
