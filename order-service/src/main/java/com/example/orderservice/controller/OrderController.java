@@ -64,6 +64,17 @@ public class OrderController {
     @GetMapping("/{userId}/orders")
     public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId) throws Exception {
         log.info("Before retrieve orders data");
+
+//        // 무작위로 지연 발생 (예: 30% 확률로 3초 지연)
+//        if (Math.random() < 0.3) {
+//            try {
+//                Thread.sleep(3000);  // 3초 지연 (order-service의 타임아웃(2s)보다 김)
+////                throw new RuntimeException("Test Error");
+//            } catch (Exception e) {
+//                log.error("A timeout error occurred.");
+//            }
+//        }
+
         Iterable<OrderEntity> orderList = orderService.getOrdersByUserId(userId);
 
         List<ResponseOrder> result = new ArrayList<>();

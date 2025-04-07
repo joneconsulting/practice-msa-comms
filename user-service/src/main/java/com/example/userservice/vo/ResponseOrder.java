@@ -13,6 +13,7 @@ public class ResponseOrder {
     private Integer unitPrice;
     private Integer totalPrice;
     private String createdAt;
+    private String status;
 
     private String orderId;
 
