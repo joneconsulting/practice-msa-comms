@@ -1,0 +1,79 @@
+version: '3.9'
+
+services:
+
+#  # User Service
+#  user-service:
+#    build: ./user-service
+#    container_name: user-service
+#    logging:
+#      driver: fluentd
+#      options:
+#        fluentd-address: fluentd-central:24224
+#        tag: user-service
+#    depends_on:
+#      - zipkin
+
+#  # Order Service
+#  order-service:
+#    build: ./order-service
+#    container_name: order-service
+#    logging:
+#      driver: fluentd
+#      options:
+#        fluentd-address: fluentd-central:24224
+#        tag: order-service
+#    depends_on:
+#      - zipkin
+#
+#  # Payment Service
+#  payment-service:
+#    build: ./payment-service
+#    container_name: payment-service
+#    logging:
+#      driver: fluentd
+#      options:
+#        fluentd-address: fluentd-central:24224
+#        tag: payment-service
+#    depends_on:
+#      - zipkin
+#
+#  # Shipping Service
+#  shipping-service:
+#    build: ./shipping-service
+#    container_name: shipping-service
+#    logging:
+#      driver: fluentd
+#      options:
+#        fluentd-address: fluentd-central:24224
+#        tag: shipping-service
+#    depends_on:
+#      - zipkin
+
+  # Fluentd 중앙 서버
+  fluentd-central:
+    image: fluent/fluentd:v1.16-1
+    container_name: fluentd-central
+    ports:
+      - "24224:24224"
+      - "5170:5170"
+    volumes:
+      - ./fluentd-central/fluent.conf:/fluentd/etc/fluent.conf
+      - ./fluentd-central/logs:/fluentd/logs
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.96.0
+    container_name: otel-collector
+    ports:
+      - "4318:4318"
+    volumes:
+      - ./otel-collector/otel-config.yaml:/etc/otel-config.yaml
+    command: ["--config", "/etc/otel-config.yaml"]
+
+  # Zipkin 서버
+  zipkin:
+    image: openzipkin/zipkin:2.24
+    container_name: zipkin
+    ports:
+      - "9411:9411"

@@ -47,3 +47,10 @@
 * 주문정보가 포함된 사용자 상세보기 요청을 위해, user-service에서 order-service를 호출하게 되는데, order-service에 문제가 발생할 경우에 대한 장애 격리 처리
   * retry, circuit breaker, bulk head, timeout, fallback 처리
   * service 메소드 내에서 다른 메소드를 호출하는 경우에는 Annotation으로 선언한 resilience 작업이 실행되지 않으며, 이를 처리하기 위한 별도의 클래스를 생성하여 작업 처리하도록 구현 (user-service 프로젝트의 OrderService.java)
+
+### Observability
+* 서비스 간에 발생되는 로그를 Fluend 서비스에 통합하여 처리
+> * branch 명: observability
+* user-service, order-service, payment-service, shipping-service의 로그를 fluentd-central에 저장
+* fluentd-central에서 마이크로서비스의 모든 로그를 관리
+* zipkin을 이용하여 정보 수집

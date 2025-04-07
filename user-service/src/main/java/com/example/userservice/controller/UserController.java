@@ -73,10 +73,7 @@ public class UserController {
     @GetMapping("/welcome")
     @Timed(value="users.welcome", longTask = true)
     public String welcome(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("users.welcome ip:" + request.getRemoteAddr() +
-                "," + request.getRemoteHost() +
-                "," + request.getRequestURI() +
-                "," + request.getRequestURL());
+        log.info("users.welcome ip: {}, {}, {}, {}", request.getRemoteAddr(), request.getRemoteHost(), request.getRequestURI(), request.getRequestURL());
         return greeting.getMessage();
     }
 
@@ -131,6 +128,7 @@ public class UserController {
     )
     @GetMapping("/users/{userId}")
     public ResponseEntity getUser(@PathVariable("userId") String userId) {
+        log.info("Called getUser method: {}", userId);
         UserDto userDto = userService.getUserByUserId(userId);
 
         if (userDto == null) {
