@@ -54,3 +54,9 @@
 * user-service, order-service, payment-service, shipping-service의 로그를 fluentd-central에 저장
 * fluentd-central에서 마이크로서비스의 모든 로그를 관리
 * zipkin을 이용하여 정보 수집
+
+### Security
+* 서비스 API 호출에 제한을 두기 위한 Rate Limiting 처리
+> * branch 명: security
+* user-service의 Filter에 1분에 10회 이상의 호출이 되지 않도록 수정, 
+* user-service의 health-check API가 10초안에 5회 이상 호출 되지 않도록 수정

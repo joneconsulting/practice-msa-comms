@@ -1,5 +1,6 @@
 package com.example.userservice.security;
 
+import com.example.userservice.filter.RateLimitingFilter;
 import com.example.userservice.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,14 +33,18 @@ public class WebSecurityNew {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private Environment env;
 
+    private RateLimitingFilter rateLimitingFilter;
+
     public static final String ALLOWED_IP_ADDRESS = "127.0.0.1";
     public static final String SUBNET = "/32";
     public static final IpAddressMatcher ALLOWED_IP_ADDRESS_MATCHER = new IpAddressMatcher(ALLOWED_IP_ADDRESS + SUBNET);
 
-    public WebSecurityNew(Environment env, UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public WebSecurityNew(Environment env, UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder,
+                          RateLimitingFilter rateLimitingFilter) {
         this.env = env;
         this.userService = userService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.rateLimitingFilter = rateLimitingFilter;
     }
 
     @Bean
@@ -65,7 +70,7 @@ public class WebSecurityNew {
                         .requestMatchers("/**").access(
                                 new WebExpressionAuthorizationManager(
                                         "hasIpAddress('127.0.0.1') or hasIpAddress('::1')" +
-                                                " or hasIpAddress('172.16.31.34') or hasIpAddress('172.16.31.34/32')")) // host pc ip address
+                                                " or hasIpAddress('172.30.1.87') or hasIpAddress('172.30.1.87/32')")) // host pc ip address
                         .anyRequest().authenticated()
                 )
                 .authenticationManager(authenticationManager)
@@ -75,6 +80,7 @@ public class WebSecurityNew {
         http.addFilter(getAuthenticationFilter(authenticationManager));
 
         http.addFilterBefore(new IpAddressLoggingFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()));
 
