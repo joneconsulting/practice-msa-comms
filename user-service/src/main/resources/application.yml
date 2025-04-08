@@ -18,6 +18,11 @@ spring:
     url: jdbc:h2:mem:testdb
     username: sa
     password:
+  redis:
+    host: localhost        # Docker Compose에서 Redis 컨테이너 네트워크 호스트명
+    port: 6379
+  session:
+    store-type: redis  # Spring Session이 Redis 사용
 
 greeting:
   message: Welcome to the Simple E-commerce.

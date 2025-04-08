@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    # Redis는 다른 서비스에 선행하여 기동
+    command: redis-server --appendonly yes
+#  user-service:
+#    build: ./user-service  # Dockerfile이 있는 경로 (user-service 디렉토리)
+#    container_name: user-service
+#    ports:
+#      - "8081:8080"       # 호스트포트:컨테이너포트
+#    depends_on:
+#      - redis
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker  # docker 프로필 사용 (옵션)
+#  order-service:
+#    build: ./order-service
+#    container_name: order-service
+#    ports:
+#      - "8082:8080"
+#    depends_on:
+#      - redis
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker

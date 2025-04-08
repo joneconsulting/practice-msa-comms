@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,13 @@ public class UserController {
                 + ", message=" + env.getProperty("greeting.message")
                 + ", token secret=" + greeting.getSecret()
                 + ", token expiration time=" + env.getProperty("token.expiration_time"));
+    }
+
+    @GetMapping("/profile")
+    public String userProfile(HttpSession session) {
+        String userId = (String) session.getAttribute("USER_ID");
+        // userId로 사용자 프로필 조회 처리
+        return "session user_id=" + userId;
     }
 
     @Operation(summary = "환영 메시지 출력 API", description = "Welcome message를 출력하기 위한 API")

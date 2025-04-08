@@ -11,6 +11,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -77,5 +78,9 @@ public class AuthenticationFilterNew  extends UsernamePasswordAuthenticationFilt
 
         res.addHeader("token", token);
         res.addHeader("userId", userDetails.getUserId());
+
+        // 사용자 ID를 세션에 저장
+        HttpSession session = req.getSession();
+        session.setAttribute("USER_ID", userDetails.getUserId());
     }
 }
