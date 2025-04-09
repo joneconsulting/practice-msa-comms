@@ -34,7 +34,7 @@ public class OrderController {
 
     @GetMapping("/health-check")
     public String status() {
-        return String.format("It's Working in Order Service on LOCAL PORT %s (SERVER PORT %s)",
+        return String.format("It's Working in Order Service V2 on LOCAL PORT %s (SERVER PORT %s)",
                 env.getProperty("local.server.port"),
                 env.getProperty("server.port"));
     }

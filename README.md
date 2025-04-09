@@ -76,3 +76,9 @@
 * user-service에서 로그인 시 사용자 ID 정보를 Redis저장 
 * order-service에서 사용자 주문목록 확인 시, 2번째 부터는 캐시에 기록된 정보를 이용하여 반환
   * 주문 추가시 사용자 세션 삭제 로직 필요
+
+### Deployment
+* 마이크로서비스 배포 전략
+> * branch 명: deployment
+* order-service에 대해 Blue-Green, Canary, AB Test에 대해 배포 예제
+    * docker-compose + nginx 조합으로 배포 테스트

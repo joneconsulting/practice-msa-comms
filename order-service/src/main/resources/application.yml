@@ -1,5 +1,6 @@
 server:
   port: 8082
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -14,16 +15,20 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:mem:testdb
+#    username: sa
+#    password:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://mariadb:3306/mydb
+    username: root
+    password: test1357
   cache:
     type: redis               # 스프링 캐시로 Redis 사용
     redis:
       time-to-live: 300s      # 캐시 TTL 300초 (5분)
   redis:
-    host: localhost               # Redis 컨테이너 호스트명 (docker-compose)
+    host: redis               # Redis 컨테이너 호스트명 (docker-compose)
     port: 6379
 #grpc:
 #  server:
