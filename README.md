@@ -23,6 +23,22 @@
 * user-service에서 주문을 요청하면 order-service에서 주문 데이터를 저장한 다음, 해당 주문 데이터를 Kafka Topic으로 전송
 * shipping-service에서는 Kafka Topic에 전달 된 메시지를 가지고 배송 데이터로 저장
 
+### CQRS + Event Sourcing
+* CQRS를 이용하여 Command 작업과 Query 작업을 분리하고, 데이터 상태 변경을 Event Store(DB)에 저장
+> * branch 명: cqrs1
+* user-service에서 주문을 요청하면 order-service에서 주문 데이터를 저장할 때, 기존의 Orders 테이블에 저장하는 것 대신, Order_event 테이블에 상태를 기록
+* 주문 내용에 대해 추가 및 수정 작업에 대해 Event sourcing 작업 처리
+* 사용자 상세정보 요청 시, 주문목록을 표시할 때 Event Store에 기록 된 상태를 Replay하여 데이터의 최종값 결정
+> * branch 명: cqrs2
+* order-service에서 주문 데이터를 저장한 다음, ApplicationEventPublisher를 이용한 OrderEvent를 발행
+* OrderEvent는 @EventListener로 등록 된 서비스가 Consumer로써 메시지를 소비할 수 있도록 처리
+
+### Sharding
+* user-service의 DB를 2개의 Mariadb(shard1, shard2)로 분리하여 저장한 다음, Sharding key를 구분하여 2개의 DB에 분산되어 저장하도록 처리
+> * branch 명: sharding
+* 초기 테이블이가 shard1(또는 shard2)에만 생길 수 있기 때문에, 다른 쪽 shard에 수동으로 테이블 생성 필요
+* 전체 데이트 조회하는 API는 2개의 DB에 분산되어 저장된 데이터를 모두 가져오도록 구현되어 있지 않았기 때문에, 한쪽의 데이터만 보임
+
 ### SAGA
 * 분산 트랜잭션에서 오류 발생 시 처리 작업을 이전으로 돌리기 위한(Roll back) 보상 트랜잭션 처리
 > * branch 명: saga1
