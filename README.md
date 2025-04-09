@@ -62,17 +62,23 @@
 * user-service의 health-check API가 10초안에 5회 이상 호출 되지 않도록 수정
 
 ### Test
-* 마이크로서비스에 대한 테스트 전략 
+* 마이크로서비스에 대한 테스트 전략
 > * branch 명: test
 * user-service API에 대한 테스트 코드
-  * UserServiceImplUnitTest
-  * UserServiceComponentTest
-  * UserServiceIntegrationTest
-  * UserServiceE2ETest
+    * UserServiceImplUnitTest
+    * UserServiceComponentTest
+    * UserServiceIntegrationTest
+    * UserServiceE2ETest
 
 ### Cache
 * 마이크로서비스에 캐시 처리 추가
 > * branch 명: cache
-* user-service에서 로그인 시 사용자 ID 정보를 Redis저장 
+* user-service에서 로그인 시 사용자 ID 정보를 Redis저장
 * order-service에서 사용자 주문목록 확인 시, 2번째 부터는 캐시에 기록된 정보를 이용하여 반환
-  * 주문 추가시 사용자 세션 삭제 로직 필요
+    * 주문 추가시 사용자 세션 삭제 로직 필요
+
+### Deployment
+* 마이크로서비스 배포 전략
+> * branch 명: deployment
+* order-service에 대해 Blue-Green, Canary, AB Test에 대해 배포 예제
+    * docker-compose + nginx 조합으로 배포 테스트
