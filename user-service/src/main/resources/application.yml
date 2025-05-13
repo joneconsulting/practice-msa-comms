@@ -40,10 +40,3 @@ gateway:
 token:
   expiration_time: 86400000
   secret: user_token_test_for_jwt_token_20250328
-
-#grpc:
-#  client:
-#    order-service:
-#      address: 'static://localhost:9099'
-#      enableKeepAlive: true
-#      negotiationType: PLAINTEXT
