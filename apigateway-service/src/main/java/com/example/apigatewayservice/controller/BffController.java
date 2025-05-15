@@ -1,6 +1,7 @@
 package com.example.apigatewayservice.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -33,14 +34,23 @@ public class BffController {
 
     // 로그인 (User-Service 호출)
     @PostMapping("/login")
-    public Mono<String> login(@RequestBody Map<String, Object> credentials) {
+    public Mono<ResponseEntity<String>> login(@RequestBody Map<String, Object> credentials) {
         log.info("login method called");
         return loadBalancedWebClientBuilder.build()
                 .post()
                 .uri("http://user-service/login")
                 .bodyValue(credentials)
                 .retrieve()
-                .bodyToMono(String.class);
+                .toEntity(String.class)
+                .map(clientResponse -> {
+                    String body = clientResponse.getBody();
+                    String customHeader = clientResponse.getHeaders().getFirst("Token");
+
+                    return ResponseEntity
+                            .ok()
+                            .header("Token", customHeader != null ? customHeader : "N/A")
+                            .body(body);
+                });
     }
 
     // 전체 회원 목록 조회 (User-Service 호출)
