@@ -47,9 +47,11 @@
 * order-service에서는 주문 데이터를 Kafka Topic으로 전송
 * payment-service에서는 Kafka Topic에 전달 된 메시지를 가지고 결제 처리 프로세스 시작, 결제 결과를 Kafka Topic으로 전송
     * 결제가 실패 되었을 때는 Kafka Topic에 실패 메시지를 전달
+    * 결제 실패 조건) 결제 금액이 100,000원 초과의 경우 
 * shipping-service에서
     * 결제가 성공 되었을 때, "배송 시작" 상태로 변경
     * 결제가 실패 되었을 때, Kafka Topic에 실패 메시지를 전달하고 상태를 "실패"로 변경
+    * 배송 실패 조건) 재고 부족 -> 주문 수량이 5개 이상일 경우
 
 ### EDA
 * 서비스간 통신에서 API를 직접 호출하는 것이 아닌, 이벤트 발생/구독을 통해 처리하는 Event-Driven Architecture 사용
