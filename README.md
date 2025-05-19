@@ -41,6 +41,7 @@
 
 ### SAGA
 * 분산 트랜잭션에서 오류 발생 시 처리 작업을 이전으로 돌리기 위한(Roll back) 보상 트랜잭션 처리
+   * 구동 서비스: service-discovery, apigateway-service, user-service, order-service, payment=service, shopping-service 
 > * branch 명: saga1
 * user-service에서 주문을 요청하면 order-service에서 주문 데이터를 저장
 * order-service에서는 주문 데이터를 Kafka Topic으로 전송
