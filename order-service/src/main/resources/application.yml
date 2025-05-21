@@ -53,4 +53,3 @@ management:
     web:
       exposure:
         include: health, httptrace, info, metrics, prometheus
-
