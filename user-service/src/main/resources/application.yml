@@ -56,29 +56,33 @@ token:
   secret: user_token_test_for_jwt_token_20250328
 
 resilience4j:
-  bulkhead:
+  retry:
+    configs:
+      default:
+        maxAttempts: 3            # 최대 재시도 횟수 (최초 호출 포함)
+        waitDuration: 1000        # 재시도 간 대기 시간(ms)
+        retryExceptions:          # 재시도할 예외 목록
+          - java.io.IOException
+        ignoreExceptions:         # 무시할 예외 목록 (재시도하지 않을 예외)
+          - java.lang.NullPointerException
     instances:
       orderService:
-        maxConcurrentCalls: 5       # 동시에 5개 호출까지 허용 (세마포어 방식)
-  thread-pool-bulkhead:
-    instances:
-      orderService:
-        coreThreadPoolSize: 2       # 스레드풀 최소 2개, 최대 2개
-        maxThreadPoolSize: 2
-        queueCapacity: 10           # 대기 큐에 10개까지 요청 저장
-  timelimiter:
-    instances:
-      orderService:
-        timeoutDuration: 2s    # 2초 초과 시 타임아웃
-        cancelRunningFuture: true
+        baseConfig: default     # configs에서 지정한 default 사용
   circuitbreaker:
     instances:
       orderService:
-        slidingWindowSize: 5            # 최근 5번의 호출 기록으로 계산
-        failureRateThreshold: 50        # 실패율 50% 초과 시 회로 열기
-        waitDurationInOpenState: 10s    # Open 상태 유지 시간 (10초)
-  retry:
+        sliding-window-size: 5             # 슬라이딩 윈도우 크기 (최근 5번의 호출 기록으로 계산)
+        minimum-number-of-calls: 5          # 계산에 포함되기 위한 최소 호출 수
+        failure-rate-threshold: 50          # 실패율 임계치(실패율 50% 초과 시 회로 열기)
+        wait-duration-in-open-state: 10s    # 회로 열린 후 닫히기까지 대기 시간
+  thread-pool-bulkhead:               # 비동기 작업용 CompletableFuture + @Async
     instances:
       orderService:
-        maxAttempts: 3       # 최대 3번 시도
-        waitDuration: 1s     # 재시도 간 1초 대기
+        max-thread-pool-size: 1       # 최대 스레드 수
+        core-thread-pool-size: 1      # 기본 스레드 수
+        queue-capacity: 1             # 대기 큐에 1개까지 요청 저장
+  timelimiter:
+    instances:
+      orderService:
+        timeout-duration: 2s          # 응답 타임아웃 시간 (2초)
+        cancel-running-future: true   # 타임아웃 시 진행 중인 작업 중단

@@ -42,7 +42,7 @@ public class OrderService {
     @Retry(name = "orderService", fallbackMethod = "orderListFallback")
     @CircuitBreaker(name = "orderService", fallbackMethod = "orderListFallback")
     @Bulkhead(name = "orderService", type = Bulkhead.Type.THREADPOOL, fallbackMethod = "orderListFallback")
-    @TimeLimiter(name = "orderService")  // CompletableFuture 리턴 메서드에 타임아웃 적용
+    @TimeLimiter(name = "orderService")  // CompletableFuture 반환 메서드에서만 타임아웃 적용
     public CompletableFuture<List<ResponseOrder>> getOrderListByUserId(String userId) {
         log.info("Before call orders microservice: userId [{}]", userId);
         String orderUrl = String.format("http://127.0.0.1:8082/%s/orders", userId);
@@ -56,7 +56,21 @@ public class OrderService {
     }
 
     public CompletableFuture<List<ResponseOrder>> orderListFallback(String userId, Throwable ex) {
-        log.error("Executed fallback method. {}, {}", userId, ex.getMessage());
+        log.error("[Retry+Circuitbreaker] Fallback for order: user_id: {}, {}", userId, ex.getMessage());
         return CompletableFuture.completedFuture(new ArrayList<>());
+    }
+
+    /* bulkhead demo */
+    @Bulkhead(name = "orderService", type = Bulkhead.Type.THREADPOOL, fallbackMethod = "bulkheadFallbackOrder")
+    public CompletableFuture<String> getOrderAsync(String userId) throws InterruptedException {
+        log.info("Processing order for user: {}", userId);
+        Thread.sleep(10000); // 일부러 지연
+
+        return CompletableFuture.completedFuture("Order result for " + userId);
+    }
+
+    public CompletableFuture<String> bulkheadFallbackOrder(String userId, Throwable t) {
+        log.warn("[Bulkhead] Fallback for user: {} due to {}", userId, t.getMessage());
+        return CompletableFuture.completedFuture("Fallback result for " + userId);
     }
 }
