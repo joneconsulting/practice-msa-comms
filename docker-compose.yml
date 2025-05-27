@@ -33,7 +33,7 @@ services:
   order-service-blue:
     image: order-service:v1
     ports:
-      - "18081:8082"
+      - "18082:8082"
     depends_on:
       - redis
     networks:
@@ -41,7 +41,7 @@ services:
   order-service-green:
     image: order-service:v2
     ports:
-      - "18082:8082"
+      - "28082:8082"
     depends_on:
       - redis
     networks:
@@ -52,8 +52,11 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-#      - ./nginx-abtest.conf:/etc/nginx/nginx.conf
+#      - ./nginx-blue.conf:/etc/nginx/nginx.conf
+#      - ./nginx-green.conf:/etc/nginx/nginx.conf
+#      - ./nginx-weight.conf:/etc/nginx/nginx.conf
+      - ./nginx-abtest.conf:/etc/nginx/nginx.conf
+
     depends_on:
       - order-service-blue
       - order-service-green
